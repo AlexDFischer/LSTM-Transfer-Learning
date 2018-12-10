@@ -1,0 +1,37 @@
+RMSProp lr=0.01:
+
+on epoch 0
+	training loss = 4.867277
+	validation loss = 4.867233
+on epoch 1
+	training loss = 3.168052
+	validation loss = 3.159729
+on epoch 2
+	training loss = 3.177199
+	validation loss = 3.172680
+on epoch 3
+	training loss = 2.620162
+	validation loss = 2.629901
+on epoch 4
+	training loss = 2.261823
+	validation loss = 2.272380
+on epoch 5
+	training loss = 2.054307
+	validation loss = 2.061966
+on epoch 6
+	training loss = 1.851111
+	validation loss = 1.857222
+on epoch 7
+	training loss = 1.727517
+	validation loss = 1.735655
+on epoch 8
+	training loss = 1.617146
+	validation loss = 1.624586
+on epoch 9
+	training loss = 1.536911
+	validation loss = 1.545670
+on epoch 10
+	training loss = 1.487707
+	validation loss = 1.497651
+
+    torch.save(model.state_dict(), 'model_checkpoint_epoch_' + str(epoch))
