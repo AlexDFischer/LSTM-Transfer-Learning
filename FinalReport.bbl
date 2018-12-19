@@ -1,9 +1,16 @@
-\begin{thebibliography}{1}\itemsep=-1pt
+\begin{thebibliography}{10}\itemsep=-1pt
 
 \bibitem{graves2013generating}
 A.~Graves.
 \newblock Generating sequences with recurrent neural networks.
 \newblock {\em arXiv preprint arXiv:1308.0850}, 2013.
+
+\bibitem{LSTMArchitecturesSurvey}
+K.~Greff, R.~K. Srivastava, J.~Koutn\'{i}k, B.~R. Steunebrink, and
+  J.~Schmidhuber.
+\newblock Lstm: A search space odyssey.
+\newblock {\em IEEE Transactions on Neural Networks and Learning Systems},
+  28(10):2222--2232, 2017.
 
 \bibitem{LSTM}
 S.~Hochreiter, Killough, and J.~Schmidhuber.
@@ -34,6 +41,19 @@ Y.~Miao and F.~Metze.
 A.~S. Razavian, H.~Azizpour, J.~Sullivan, and S.~Carlsson.
 \newblock {CNN} features off-the-shelf: an astounding baseline for recognition.
 \newblock In {\em CVPR}, 2014.
+
+\bibitem{Dropout}
+N.~Srivastava, G.~Hinton, A.~Krizhevsky, I.~Sutskever, and R.~Salakhutdinov.
+\newblock Dropout: a simple way to prevent neural networks from overfitting.
+\newblock {\em The Journal of Machine Learning Research}, 15(1):1929--1958,
+  2014.
+
+\bibitem{RMSProp}
+T.~Tieleman and G.~Hinton.
+\newblock Lecture 6.5-rmsprop: Divide the gradient by a running average of its
+  recent magnitude.
+\newblock {\em COURSERA: Neural networks for machine learning}, 4(2):26--31,
+  2012.
 
 \bibitem{TransferableFeaturesNN}
 J.~Yosinski, J.~Clune, Y.~Bengio, and H.~Lipson.
