@@ -16,6 +16,13 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{pbox}
+\usepackage{listings}
+\lstset{
+	basicstyle=\ttfamily,
+	columns=fullflexible,
+	frame=single,
+	breaklines=true,
+}
 
 % Include other packages here, before hyperref.
 
@@ -214,7 +221,142 @@ University of Massachusetts, Amherst\\
 	\subsection{Example Generated Songs}
 		While the above quantitative results give a rigorous, mathematical description of the performance increases that resulted from our transfer learning methodology, samples from the best models from each category can give us an intuitive, qualitative understanding of the improvements from our methods.
 		
-		To sample songs from our network, we used a softmax layer on top of the character scores output with a temperature of TODO as our character probability distribution. Because our character encoding includes some nonprintable characters (namely, those charaacters with decimal value less than or equal to 31), we keep sampling characters at each timestep until we sample a printable character. TODO
+		To sample songs from our network, we used a softmax layer on top of the character scores output with a temperature of 0.5 as our character probability distribution. Because our character encoding includes some nonprintable characters (namely, those characters with decimal value less than or equal to 31 except for the newline and tab characters), we keep sampling characters at each timestep until we sample a printable character. See Figures \ref{notransfer_sample}, \ref{gutenberg_sample}, and \ref{lyrics_sample}.
+		
+		The samples from the models trained using transfer learning appear to output a higher percentage of actual English words than the sample from the model trained only on Beatles Lyrics. However, the advantages of the transferred models seem marginal at best---none of the generated text makes much sense.
+		
+		For each sample, we counted the number of lines that contained a syntactically correct sentence with at least some semantic meaning. We counted two from the sample from the network trained on only Beatles lyrics (``I know of down.'', ``You love you'', ``I know.''). We counted four from the sample from the network pretrained on Project Gutenberg data (``I love.'', ``And I'm down.'', ``It's better'', ``I feel''). And we counted three from the sample from the network pretrained on the song lyrics data (``Bring you'', ``He's a better light to me'', ``(You kill then when I'll believe)''). These counts could vary depending on one's threshold for minimum semantic meaning, or if one chooses to include syntactically correct and semantically meaningful clauses instead of just distinct sentences.
+		
+		\begin{figure}
+			\begin{lstlisting}
+The my do.
+She go wan a some ale of days it you get bedres of baby,
+Thay you show she skingenes treats me.
+
+I know the mine true.
+
+Juhing me.
+I dont gaed,
+I wannyoull town to that you do.
+Little noo mold to love you,
+Baby,
+I love you aver might.
+Good in in best ev'ry.
+
+I know I same
+Well a want, let hike doon,
+I know of down.
+
+Shourd way the to love me,
+I want and song it be that shille of matter me
+Come to molong
+
+Love of mank, you love you.
+Bether dear.
+You donny whyy, Murle das gets what I get bamy,
+I want 'f can the gats it's if your hood's shue,
+Don't dinh anat no wind, Kom't chakand.
+
+Well Im lot when she way a feel alwaysting to you, Im a matter word.
+Baby with I do.
+
+For aver it beher.
+
+Hey, you love me down, dont
+You love you
+Haded me look doard fun, Uhaog.
+
+Eight whet do.
+That I olent the lipt dost zuch they ald me.
+That me, ont like will say you, lave it beat, back, m'be, kist Oh.
+Ght, I'm go to momed made, love you,
+I know.
+
+I'm down, do. Im loune only master mine, love you 
+			\end{lstlisting}
+			\caption{Song lyrics generated from out best network that was trained only on Beatles lyrics data.}
+			\label{notransfer_sample}
+		\end{figure}
+		
+		\begin{figure}
+			\begin{lstlisting}
+The love keep all in the world
+
+Well.
+
+very really be in my get to love shes ambetes of the sand little get all the belong,
+Don't be a sky of bed it be.
+I wanna have in the with you.
+Endee always, cant you wanna hay I hear you, after with the some undelds musing in the a taxmons
+I trould not bey I sad think a little getting me.
+
+Everybody way
+
+I love.
+Rus a tom can I said I'm going the and down
+And I'm down.
+
+She's of there.
+Well the sky on the looks adsilg to me
+What been,
+Im it tree
+I'll m'tould be, girl in the love, shopers dads to plamine and love
+And the beave
+Sker a feel (und on it get how way is the undeand.
+
+It's better
+Take you are
+The light really come out.
+What I know she say where the way the mone my be, let a down,
+That she's gonna wine in my world me.
+That now.
+
+When you know I with shes so wont to getter be, love mine in the kit Don't want.
+
+Hey are roal and fool in the morning all a the oud clopetout
+
+Well me what I want)
+I feel
+And the one a little girl
+I'm more is she 
+			\end{lstlisting}
+			\caption{Song lyrics generated from a network that was pretrained on Project Gutenberg data that then had its first and last LSTM layer (and hidden-state-to-character layer) retrained. This model is the one from the second row of \tablename{\ref{GutenbergResults}}.}
+			\label{gutenberg_sample}
+		\end{figure}
+		
+		\begin{figure}
+			\begin{lstlisting}
+The Heart The word of me her the know you, the days
+I've love the world I know
+
+Bring you
+
+I've dont see the and in a hand on the south, in love, follow a me jum call all the moon  
+Well I know I want you to With the what I will shine the land won't some looking of throtk to me and me one day
+
+I'm a bifl better like it the other got beg love halley got you alone, she want you wanting of the scart.
+
+He's a better light to me  
+Note away and the world.
+
+Love in your only oh come the things I now I can't be.
+
+Lat a love me.
+
+She give we'll feel for you back 'gurner, the car with why I wander in the love from how money ta me your shoes and bitter me broken go born (You kill then when I'll believe)
+
+Take everything in your head with resays you're more you believe, don't knew you, now In a bite the sky.
+Seck place
+20s the mar on you s  to say,
+
+Who loves you, save the one that waiting say you love you when you
+
+Yeah dont what we bet you prosed the shadow on the marrort set him better
+can want
+			\end{lstlisting}
+			\caption{Song lyrics generated from a network that was pretrained on song lyrics data that then had its final LSTM layer (and hidden-state-to-character layer) retrained. This model is the one from the last row of \tablename{\ref{LyricsResults}}.}
+			\label{lyrics_sample}
+		\end{figure}
 
 \section{Further Work}
 	While some of the results from our transfer learning experiments match what we would expect given our knowledge of transfer learning with convolutional neural networks for computer vision, some of the results did not match. The performance of a network learned from a pretrained network on the Beatles dataset generally depended the number of layers we re-trained, but not the specific layer that we re-trained. For example, re-training the last layer of a 3-layer LSTM pretrained on lyrics data performed approximately the same as re-training the first layer.
