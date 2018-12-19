@@ -1,0 +1,43 @@
+\begin{thebibliography}{1}\itemsep=-1pt
+
+\bibitem{graves2013generating}
+A.~Graves.
+\newblock Generating sequences with recurrent neural networks.
+\newblock {\em arXiv preprint arXiv:1308.0850}, 2013.
+
+\bibitem{LSTM}
+S.~Hochreiter, Killough, and J.~Schmidhuber.
+\newblock Long short-term memory.
+\newblock {\em Neural Computation}, 9(8):1735--1780, 1997.
+
+\bibitem{KaggleLyrics}
+S.~Kuznetsov.
+\newblock 55000+ song lyrics.
+\newblock \url{https://www.kaggle.com/mousehead/songlyrics/home}.
+
+\bibitem{Gutenberg}
+S.~Lahiri.
+\newblock {Complexity of Word Collocation Networks: A Preliminary Structural
+  Analysis}.
+\newblock In {\em Proceedings of the Student Research Workshop at the 14th
+  Conference of the European Chapter of the Association for Computational
+  Linguistics}, pages 96--105, Gothenburg, Sweden, April 2014. Association for
+  Computational Linguistics.
+
+\bibitem{SpeakerAdaptation}
+Y.~Miao and F.~Metze.
+\newblock On speaker adaptation of long short-term memory recurrent neural
+  networks.
+\newblock In {\em Interspeech}, 2015.
+
+\bibitem{CNNOffTheShelf}
+A.~S. Razavian, H.~Azizpour, J.~Sullivan, and S.~Carlsson.
+\newblock {CNN} features off-the-shelf: an astounding baseline for recognition.
+\newblock In {\em CVPR}, 2014.
+
+\bibitem{TransferableFeaturesNN}
+J.~Yosinski, J.~Clune, Y.~Bengio, and H.~Lipson.
+\newblock How transferable are features in deep neural networks?
+\newblock In {\em NIPS}, 2014.
+
+\end{thebibliography}
