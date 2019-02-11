@@ -1,0 +1,64 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{CNNOffTheShelf}
+\citation{TransferableFeaturesNN}
+\citation{SpeakerAdaptation}
+\citation{LSTM}
+\citation{graves2013generating}
+\@writefile{toc}{\contentsline {section}{\numberline {1}\hskip -1em.\nobreakspace  {}Introduction}{1}{section.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}\hskip -1em.\nobreakspace  {}Stacked LSTM's}{1}{subsection.1.1}}
+\citation{KaggleLyrics}
+\citation{Gutenberg}
+\citation{graves2013generating}
+\citation{LSTMArchitecturesSurvey}
+\citation{RMSProp}
+\@writefile{toc}{\contentsline {section}{\numberline {2}\hskip -1em.\nobreakspace  {}Problem Statement}{2}{section.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}\hskip -1em.\nobreakspace  {}Datasets}{2}{subsection.2.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}\hskip -1em.\nobreakspace  {}Technical Approach}{2}{section.3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Our 3-layer stacked LSTM architecture. $h_{i,t}$ and $c_{i,t}$ refer to the hidden state and memory state, respectively, of level $i$ of the stack at timestep $t$. Blue boxes represent individual LSTM layers, and red boxes represent fully connected linear layers.}}{2}{figure.1}}
+\newlabel{3LayerLSTMDiagram}{{1}{2}{Our 3-layer stacked LSTM architecture. $h_{i,t}$ and $c_{i,t}$ refer to the hidden state and memory state, respectively, of level $i$ of the stack at timestep $t$. Blue boxes represent individual LSTM layers, and red boxes represent fully connected linear layers}{figure.1}{}}
+\citation{Dropout}
+\@writefile{toc}{\contentsline {section}{\numberline {4}\hskip -1em.\nobreakspace  {}Experimental Results}{3}{section.4}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Results for transferring a 3-layer stacked LSTM network trained on Project Gutenberg books to song lyrics from The Beatles. We used cross-entropy as our loss function. The best network we could train on only the Beatles dataset resulted in a validation loss of 1.039 and a training loss of 1.179.}}{3}{table.1}}
+\newlabel{GutenbergResults}{{1}{3}{Results for transferring a 3-layer stacked LSTM network trained on Project Gutenberg books to song lyrics from The Beatles. We used cross-entropy as our loss function. The best network we could train on only the Beatles dataset resulted in a validation loss of 1.039 and a training loss of 1.179}{table.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Results for transferring a 3-layer stacked LSTM network trained on general song lyrics to song lyrics from The Beatles. We used cross-entropy as our loss function. The best network we could train on only the Beatles dataset resulted in a validation loss of 1.039 and a training loss of 1.179.}}{3}{table.2}}
+\newlabel{LyricsResults}{{2}{3}{Results for transferring a 3-layer stacked LSTM network trained on general song lyrics to song lyrics from The Beatles. We used cross-entropy as our loss function. The best network we could train on only the Beatles dataset resulted in a validation loss of 1.039 and a training loss of 1.179}{table.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}\hskip -1em.\nobreakspace  {}Example Generated Songs}{4}{subsection.4.1}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}\hskip -1em.\nobreakspace  {}Further Work}{4}{section.5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Song lyrics generated from out best network that was trained only on Beatles lyrics data.}}{4}{figure.2}}
+\newlabel{notransfer_sample}{{2}{4}{Song lyrics generated from out best network that was trained only on Beatles lyrics data}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Song lyrics generated from a network that was pretrained on Project Gutenberg data that then had its first and last LSTM layer (and hidden-state-to-character layer) retrained. This model is the one from the second row of Table{\ref  {GutenbergResults}}.}}{5}{figure.3}}
+\newlabel{gutenberg_sample}{{3}{5}{Song lyrics generated from a network that was pretrained on Project Gutenberg data that then had its first and last LSTM layer (and hidden-state-to-character layer) retrained. This model is the one from the second row of \tablename {\ref {GutenbergResults}}}{figure.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Song lyrics generated from a network that was pretrained on song lyrics data that then had its final LSTM layer (and hidden-state-to-character layer) retrained. This model is the one from the last row of Table{\ref  {LyricsResults}}.}}{5}{figure.4}}
+\newlabel{lyrics_sample}{{4}{5}{Song lyrics generated from a network that was pretrained on song lyrics data that then had its final LSTM layer (and hidden-state-to-character layer) retrained. This model is the one from the last row of \tablename {\ref {LyricsResults}}}{figure.4}{}}
+\citation{CNNOffTheShelf}
+\citation{TransferableFeaturesNN}
+\bibstyle{ieee}
+\bibdata{egbib}
+\bibcite{graves2013generating}{1}
+\bibcite{LSTMArchitecturesSurvey}{2}
+\bibcite{LSTM}{3}
+\bibcite{KaggleLyrics}{4}
+\bibcite{Gutenberg}{5}
+\bibcite{SpeakerAdaptation}{6}
+\bibcite{CNNOffTheShelf}{7}
+\bibcite{Dropout}{8}
+\bibcite{RMSProp}{9}
+\bibcite{TransferableFeaturesNN}{10}
+\@writefile{toc}{\contentsline {section}{\numberline {6}\hskip -1em.\nobreakspace  {}Conclusion}{6}{section.6}}

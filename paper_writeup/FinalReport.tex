@@ -1,0 +1,376 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage{cvpr}
+
+% CVPR does weird packaging stuff
+\makeatletter
+\@namedef{ver@everyshi.sty}{}
+\makeatother
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes,arrows}
+
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{pbox}
+\usepackage{listings}
+\lstset{
+	basicstyle=\ttfamily,
+	columns=fullflexible,
+	frame=single,
+	breaklines=true,
+}
+
+% Include other packages here, before hyperref.
+
+% If you comment hyperref and then uncomment it, you should delete
+% egpaper.aux before re-running latex.  (Or just hit 'q' on the first latex
+% run, let it finish, and you should be clear).
+\usepackage[breaklinks=true,bookmarks=false]{hyperref}
+
+\cvprfinalcopy % *** Uncomment this line for the final submission
+
+\def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+
+% Pages are numbered in submission mode, and unnumbered in camera-ready
+\ifcvprfinal\pagestyle{empty}\fi
+%\setcounter{page}{4321}
+\begin{document}
+
+%%%%%%%%% TITLE
+\title{Transfer Learning in Stacked LSTM's for Text Generation}
+
+\author{Alexander Fischer\\
+University of Massachusetts, Amherst\\
+{\tt\small afischer@umass.edu}
+}
+
+\maketitle
+%\thispagestyle{empty}
+
+%%%%%%%%% ABSTRACT
+\begin{abstract}
+   Recurrent neural networks, like all machine learning models, require a large amount of training data in order to be effective. One way to mitigate this problem is with transfer learning. We propose performing transfer learning on stacked LSTM's using text data. We demonstrate the effectiveness of this technique by training a stacked LSTM on a large corpus of text data (we used books from project Gutenberg), then transferring the network weights to be trained on a very small corpus of text data(we used song lyrics from the Beatles). Our network learned from the transferred network outperformed the best LSTM we could train on only the small text corpus, establishing the viability of transfer learning in this fashion.
+\end{abstract}
+
+\section{Introduction}
+	Consider the task of training a recurrent neural network to generate text of a certain type, \eg text matching the style of a particular author. This task requires a large amount of training data, so it is generally infeasible unless there exists a large corpus of such text. For example, one can train an RNN to output text similar to, say, Shakespeare's writings, as Shakespeare was a prolific writer and there exists a large corpus of his work, but one cannot train an effective RNN to output text similar to, say, lyrics of a specific musician, as one musician generally cannot write enough songs to properly train an RNN.
+	
+	Humans have no problem understanding the style of some text given only a small sample of said text. Why can they learn so much faster than RNN's? Because RNN's have to learn the entire structure of the English language from their training data, whereas humans know the structure of the English language before thinking about any textual styles. Humans {\em transfer} their knowledge of the low-level structure of English---the spelling, grammar, et cetera---to the task of recognizing and generating text of a certain style, whereas RNN's do not.
+	
+	We can improve the performance of RNN's on small training datasets by first training them on larger, more general datasets---say, the large amounts of English text from any source---then train the resulting RNN to mimic a specific source of text for which there exists little training data by only training a subset of the RNN's weights on the more specific data. This will allow the RNN to have a high enough model capacity to understand and generate text that follows the complex rules of the English language, while preventing it from overfitting the small amount of more specific training data.
+	
+	This is analogous to transfer learning tasks in computer vision. It is common to the high-level features of a high-capacity neural network trained on a large dataset such as ImageNet as inputs to a small neural network trained on a smaller dataset~\cite{CNNOffTheShelf}~\cite{TransferableFeaturesNN}. However, this is more more complicated with recurrent neural networks because it is not immediately obvious which activations correspond to lower-level features which will be invariant across different text sources (such as spelling, grammar, et cetera) and which activations correspond to higher-level features (such as word choice, subject matter, and tone), unlike with CNN's for computer vision in which the later layers correspond to higher-level features.
+	
+	Previous work~\cite{SpeakerAdaptation} has adapted a pretrained speech recognition RNN to work with a specific speaker by training a small subset of the RNN on the speaker's voice; however, to the best of our knowledge, this technique has not been attempted for text generation. Such work designed the RNN to have a specific subset of weights that is speaker dependent and thus will be trained post-tranfser.
+	
+	\subsection{Stacked LSTM's}
+		We will use stacked long short term memory (LSTM) recurrent neural networks~\cite{LSTM}~\cite{graves2013generating} for our text-generation networks. Stacked LSTM's consist of several distinct LSTM layers composed with each other. At every timestep, the input data is fed into the first LSTM, then the output of that LSTM acts as the input of the next input LSTM, and more generally the output of each LSTM acts as the input of each successive LSTM. The output of the final LSTM is the output of the entire network at any given timestep.
+		
+		We will perform transfer learning on stacked LSTM's by training the whole network on a large dataset, then training a subset of the layers on a smaller dataset. To my knowledge, this training methodology has never been used with LSTM's.
+\section{Problem Statement}
+	We have a small text dataset, and we want to train an LSTM to generate text based on that dataset; however, the size of the dataset limits the capacity of a model we can train before overfitting. Instead, we pretrain a higher-capacity stacked LSTM on a large text dataset that is similar to our goal text, then train a subset of the LSTM's weights on our goal text.
+	\subsection{Datasets}
+		We used three data sources for this project. The first, primary dataset is all song lyrics from the Beatles. This dataset is small compared to other datasets used to train recurrent neural networks. Combined, it contains 181 songs for a total of 146,000 characters. Since we used one third of the data each for training, validation, and test data, the training data for this dataset was tiny compared to most datasets used to train neural networks. This is the dataset on which we will focus our attempts to build an accurate network for text generation.
+		
+		We used two secondary datasets that we used to pretrain networks which we then transferred to train on our primary dataset. The first secondary dataset was a collection~\cite{KaggleLyrics} of lyrics from 55,000 songs from Kaggle. Its much larger size allowed us to train a much higher capacity network on it. This text is quite similar to Beatles lyrics, so we expected transfer learning to work quite well between this dataset and the Beatles dataset.
+		
+		The second secondary dataset was a collection of books from Project Gutenberg~\cite{Gutenberg}, an organization that focuses on digitizing works of literature in the public domain. Because this dataset is so massive, we sampled several books from the dataset and pretrained a network on those. Like the Kaggle dataset, the size of this dataset allowed us to train a much higher capacity network on it. This dataset is only somewhat similar to Beatles lyrics, as the public-domain books are from several decades prior and feature very different text style, so we were unsure if transferring a network trained on this dataset to the Beatles task would work.
+		
+
+	%We wish to train an RNN to generate text that  mimics some pre-existing text for which we have only a small corpus of, too small to fully train an RNN. We must train an RNN to generate English text using a large corpus of pre-existing English text, then further train the resulting RNN on the specific text to generate text in the desired style.
+	
+	%The principal challenge is to determine how to train a pretrained RNN to mimic a certain textual style. There is no obvious notion of which activation in an RNN correspond to high-level features associated with textual style, and we will have to determine that in order to effectively train a limited subset of the RNN.
+\section{Technical Approach}
+
+
+	\begin{figure}
+		
+		% Define block styles
+		\tikzstyle{lstm} = [rectangle, draw, fill=blue!20, 
+		text width=7em, text centered, rounded corners, minimum height=4em, node distance=1.5cm]
+		\tikzstyle{fclayer} = [rectangle, draw, fill=red!20, 
+		text width=7em, text centered, rounded corners, minimum height=4em, node distance=1.5cm]
+		\tikzstyle{line} = [draw, -latex']
+		\tikzstyle{h} = [draw, rectangle,fill=white!20, node distance=1.5cm,
+		minimum height=2em]
+		\tikzstyle{hc} = [draw, rectangle,fill=white!20, node distance=3.0cm,
+		minimum height=2em]
+		\tikzstyle{char} = [draw, rectangle,fill=white!20, node distance=1.5cm,
+		minimum height=2em]
+		
+		\begin{tikzpicture}
+		[align=center] 
+		
+		% Place nodes
+		\node [char] (inputchar) {input character: one-hot vector of length 128};
+		\node [fclayer, above of=inputchar] (char2hidden) {character to hidden layer: $\mathbb{R}^{128}\to\mathbb{R}^{64}$};
+		\node [lstm, above=0.5cm of char2hidden] (l0) {LSTM layer 0};
+		\node [hc, left of=l0] (hc0tm1) {$h_{0,t-1}$, $c_{0,t-1}$};
+		\node [hc, right of=l0] (hc0t) {$h_{0,t}$, $c_{0,t}$};
+		\node [h, above of=l0] (h0t) {$h_{0,t}$};
+		\node [lstm, above of=h0t] (l1) {LSTM layer 1};
+		\node [hc, left of=l1] (hc1tm1) {$h_{1,t-1}$, $c_{1,t-1}$};
+		\node [hc, right of=l1] (hc1t) {$h_{1,t}$, $c_{1,t}$};
+		\node [h, above of=l1] (h1t) {$h_{1,t}$};
+		\node [lstm, above of=h1t] (l2) {LSTM layer 2};
+		\node [hc, left of=l2] (hc2tm1) {$h_{2,t-1}$, $c_{2,t-1}$};
+		\node [hc, right of=l2] (hc2t) {$h_{2,t}$, $c_{2,t}$};
+		\node [h, above of=l2] (h2t) {$h_{2,t}$};
+		\node [fclayer, above of=h2t] (hidden2char) {hidden to character layer: $\mathbb{R}^{64}\to\mathbb{R}^{128}$};
+		\node [char, above of=hidden2char] (outputchar) {output character class scores $\in\mathbb{R}^{128}$};
+		% Draw edges
+		\path [line] (inputchar) -- (char2hidden);
+		\path [line] (char2hidden) -- (l0);
+		\path [line] (l0) -- (h0t);
+		\path [line] (h0t) -- (l1);
+		\path [line] (l1) -- (h1t);
+		\path [line] (h1t) -- (l2);
+		\path [line] (l2) -- (h2t);
+		
+		\path [line] (hc0tm1) -- (l0);
+		\path [line] (l0) -- (hc0t);
+		\path [line] (hc1tm1) -- (l1);
+		\path [line] (l1) -- (hc1t);
+		\path [line] (hc2tm1) -- (l2);
+		\path [line] (l2) -- (hc2t);
+		
+		\path [line] (h2t) -- (hidden2char);
+		\path [line] (hidden2char) -- (outputchar);
+		\end{tikzpicture}
+		\caption{Our 3-layer stacked LSTM architecture. $h_{i,t}$ and $c_{i,t}$ refer to the hidden state and memory state, respectively, of level $i$ of the stack at timestep $t$. Blue boxes represent individual LSTM layers, and red boxes represent fully connected linear layers.}
+		\label{3LayerLSTMDiagram}
+	\end{figure}
+	
+	Our first task was to train the best network we can on only the Beatles lyrics dataset. This network served as a baseline to see how much our transfer learning algorithms improve upon the default. For this task and all subsequent tasks, we used a stacked variant~\cite{graves2013generating} of a vanilla LSTM~\cite{LSTMArchitecturesSurvey} that processes text on a character level. Our character representation consisted of one-hot vectors of size 128, as we did not see any characters beyond the 128 characters in the first half of ASCII in any of our datasets (after appropriate preprocessing). Our LSTM's will had 64 hidden memory units in each layer, and a fully connected linear layer that maps $\mathbb{R}^{64}\to\mathbb{R}^{128}$ mapped from the top layer's hidden state to a vector of size 128 that represents class scores for the output character at each timestep. See figure \figurename{\ref{3LayerLSTMDiagram}} for a three layer example of our architecture.
+	
+	Once we had a baseline network trained only on Beatles data, we began the process of transfer learning. This started with pretraining higher capacity networks on the large datasets we had, namely the song lyrics dataset and the Project Gutenberg dataset. We used a three layer stacked LSTM architecture, as seen in \figurename{\ref{3LayerLSTMDiagram}}. We used RMSProp~\cite{RMSProp} (our hyperparameter values were a learning rate of $10^{-2}$, and $\alpha=0.99$) to pretrain these networks, and we used the cross entropy loss function. Every epoch, we tested the network against the validation data, and at the end of training (when the validation loss ceased decreasing substantially or started increasing), we chose the model parameters that resulted in the minimum validation loss to be the parameters of our pretrained network for that dataset.
+	
+	Once we had our pretrained networks, we turned to the task of training them on Beatles lyrics data. This consisted of training a subset of the layers of the full three layer pretrained models on the Beatles data (along with the final, hidden-state-to-character layer). We tried all nontrivial subsets (ie, not including $\emptyset$ and the subset equal to the original set) of the three layers (and retrained the hidden-state-to-character each time) with this approach. Similarly to our pretraining process, after each epoch of training with the Beatles data, we computed the loss on the validation set, and ended training after the validation loss ceased decreasing or started increasing. For each pretrained network and subset of layers that we trained, we used the model with the minimum validation loss as the model upon which we based our results.
+	
+%	To train the pretrained network on the smaller, more specific text, we will train a subset of the weights of the pretrained LSTM that produce activations that correspond to higher-level features of text. We will have to do some investigation in order to determine which weights to train. This investigation will take the form of feeding the pretrained LSTM text with various low-level and high-level features modified in specific ways and seeing which memory cells are correlated with various statistical features of the input text.
+%	
+%	For example, we will feed the pretrained LSTM text with a variety of sentiments, from happy to sad, and see which memory units and hidden-layer activations have the highest correlation with the sentiment of the input text. These memory units and hidden layer activations should correspond to high-level features, meaning the weights that affect them should be trained on the smaller, more specific corpus.
+%	
+%	We will also feed the pretrained LSTM text, then subsequently that same text but with low-level features of the text changed, such as spelling errors and slightly different wording. We will see which memory units and hidden layer activations change in response to these changes, and which ones do not change. These memory units and hidden layer activations should correspond to low-level features, meaning the weights that affect them should be held constant after pretraining.
+%	
+%	Ideally, these procedures should yield an intuitive heuristic as to which weights affect high-level and low-level features of text, rather than a hacked-together list of weights which seem to do what we want. For example, the later layers in convolution neural networks for computer vision correspond to higher-level features; we would like to discover a similar guiding principle for LSTM's. Such a guiding principle would allow us to train a much more principled, complete set of weights on our smaller, more specific corpus. It would also allow easier generalization of our results to different RNN architectures and to problems beyond English text, rather than having to repeat the aforementioned weight investigation procedures every time we wish to try a different pretrained network.
+%	
+%	To evaluate this approach, we will train a pretrained LSTM on smaller and smaller text datasets and see how small the dataset can be before the LSTM overfits it. This should be much smaller than the smallest datasets that an LSTM can be trained on from scratch without overfitting.
+%	
+%	We will use both objective and subjective metrics to measure the performance of our LSTM's. We will use the standard test-set accuracy of our LSTM's trained from pretrained complex LSTM's and compare them to the test-set accuracy of LSTM's trained from scratch on our training data. Also, for a subjective performance metric, we will subjectively compare the text generated by our LSTM's and trained-from-scratch LSTM's. It should be obvious upon reading both which network better learns the structure of the small training data by seeing which generated text seems to be a better generalization of the training data.
+\section{Experimental Results}
+	The best network we trained using only Beatles data was a 2-layer stacked LSTM with dropout~\cite{Dropout} 0.2. and hidden layer size 64. This network achieved a minimum validation set loss of 1.039, and the test set loss on that network was 1.179. In general, we experienced much higher test set error than validation set error when working with the Beatles lyrics data. This is likely due to random variance in how hard the validation set and test set examples are to predict, as each set is quite small (60 songs) and can exhibit high variance in how hard its members are to predict.
+	
+	Even with dropout, the best network we trained using only the Beatles data exhibited a large disparity between the training set error and validation/test set error. This is indicative of overfitting, which is an unsurprising result with such a small dataset.
+	
+	As expected, networks that were learned starting from transferred weights trained on larger datasets performed better on the small Beatles dataset. The results of our experiments can be see in \tablename{\ref{GutenbergResults}} and \tablename{\ref{LyricsResults}}.
+	
+	\begin{table}
+		\centering
+		\begin{tabular}{|l|l|l|}
+			\hline
+			%		\bgroup
+			%		\def\arraystretch{3}
+			\pbox{2cm}{\textbf{Layers retrained}} & \textbf{\pbox{2cm}{Minimum validation loss}} & \textbf{\pbox{2cm}{Test loss on minimum validation loss network}} \\\hline
+			%		\egroup
+			1, 2 & 0.962 & 1.100 \\\hline
+			0, 2 & 0.954 & 1.090 \\\hline
+			0, 1 & 0.964 & 1.101 \\\hline
+			0 & 1.001 & 1.133 \\\hline
+			1 & 0.983 & 1.123 \\\hline
+			2 & 0.979 & 1.116 \\\hline
+		\end{tabular}
+		\vspace{1em}
+		\caption{Results for transferring a 3-layer stacked LSTM network trained on Project Gutenberg books to song lyrics from The Beatles. We used cross-entropy as our loss function. The best network we could train on only the Beatles dataset resulted in a validation loss of 1.039 and a training loss of 1.179.}
+		\label{GutenbergResults}
+	\end{table}
+	
+	\begin{table}
+		\centering
+		\begin{tabular}{|l|l|l|}
+			\hline
+			%		\bgroup
+			%		\def\arraystretch{3}
+			\pbox{2cm}{\textbf{Layers retrained}} & \textbf{\pbox{2cm}{Minimum validation loss}} & \textbf{\pbox{2cm}{Test loss on minimum validation loss network}} \\\hline
+			%		\egroup
+			1, 2 & 0.817 & 0.949 \\\hline
+			0, 2 &  0.816 & 0.950 \\\hline
+			0, 1 & 0.818 & 0.946 \\\hline
+			0 & 0.816 & 0.949 \\\hline
+			1 & 0.816 & 0.950 \\\hline
+			2 & 0.813 & 0.946 \\\hline
+		\end{tabular}
+		\vspace{1em}
+		\caption{Results for transferring a 3-layer stacked LSTM network trained on general song lyrics to song lyrics from The Beatles. We used cross-entropy as our loss function. The best network we could train on only the Beatles dataset resulted in a validation loss of 1.039 and a training loss of 1.179.}
+		\label{LyricsResults}
+	\end{table}
+	
+	Predictably, networks pretrained on song lyrics data performed better than networks pretrained on Project Gutenberg data. Remarkably, networks pretrained on song lyrics data {\em without any retraining on Beatles data} exhibited lower validation set loss on Beatles data than networks only trained on the Beatles data, indicating how similar the two datasets are (although the pretrained, unretrained networks exhibited higher training set loss than networks only trained on the Beatles data). Networks pretrained on Project Gutenberg data without any retraining exhibited much higher validation set loss on the Beatles data than networks trained only Beatles data, which reinforces the notion that the Project Gutenberg data is less similar to our target Beatles data than the song lyrics data.
+	
+	When re-training networks pretrained on Project Gutenberg data, re-training two layers resulted in better performance on Beatles lyrics than re-training one layer, although the exact layer(s) that we re-trained mattered less than how many layers we re-trained.
+	
+	Networks pretrained on song lyrics data generally performed equally well on Beatles lyrics regardless of which and how many layers we retrained. The fact that networks pretrained on Project Gutenberg data required re-training two layers to achieve their best performance, while networks pretrained on song lyrics data only required re-training one layer is expected, as it reflects the fact that the song lyrics data is more similar to our target Beatles data than the Project Gutenberg data.
+	
+	Interestingly, networks pretrained on song lyrics data performed better when re-trained with a smaller learning rate that what worked well otherwise. We used a learning rate of $10^{-3}$ when retraining these networks, as opposed to $10^{-2}$ with all others. This matches the usual recommendation when fine-tuning transferred convolutional neural networks to reduce the learning rate post-transfer.
+	
+	\subsection{Example Generated Songs}
+		While the above quantitative results give a rigorous, mathematical description of the performance increases that resulted from our transfer learning methodology, samples from the best models from each category can give us an intuitive, qualitative understanding of the improvements from our methods.
+		
+		To sample songs from our network, we used a softmax layer on top of the character scores output with a temperature of 0.8 as our character probability distribution. Because our character encoding includes some nonprintable characters (namely, those characters with decimal value less than or equal to 31 except for the newline and tab characters), we keep sampling characters at each timestep until we sample a printable character. See Figures \ref{notransfer_sample}, \ref{gutenberg_sample}, and \ref{lyrics_sample} for samples of 1000 characters each from some of our best-performing models.
+		
+		The samples from the models trained using transfer learning appear to output a higher percentage of actual English words than the sample from the model trained only on Beatles Lyrics. However, the advantages of the transferred models seem marginal at best---none of the generated text makes much sense.
+		
+		For each sample, we counted the number of lines that contained a syntactically correct sentence with at least some semantic meaning. We counted two from the sample from the network trained on only Beatles lyrics (``I know of down.'', ``You love you'', ``I know.''). We counted four from the sample from the network pretrained on Project Gutenberg data (``I love.'', ``And I'm down.'', ``It's better'', ``I feel''). And we counted three from the sample from the network pretrained on the song lyrics data (``Bring you'', ``He's a better light to me'', ``(You kill then when I'll believe)''). These counts could vary depending on one's threshold for minimum semantic meaning, or if one chooses to include syntactically correct and semantically meaningful clauses instead of just distinct sentences.
+		
+		\begin{figure}
+			\begin{lstlisting}
+The my do.
+She go wan a some ale of days it you get bedres of baby,
+Thay you show she skingenes treats me.
+
+I know the mine true.
+
+Juhing me.
+I dont gaed,
+I wannyoull town to that you do.
+Little noo mold to love you,
+Baby,
+I love you aver might.
+Good in in best ev'ry.
+
+I know I same
+Well a want, let hike doon,
+I know of down.
+
+Shourd way the to love me,
+I want and song it be that shille of matter me
+Come to molong
+
+Love of mank, you love you.
+Bether dear.
+You donny whyy, Murle das gets what I get bamy,
+I want 'f can the gats it's if your hood's shue,
+Don't dinh anat no wind, Kom't chakand.
+
+Well Im lot when she way a feel alwaysting to you, Im a matter word.
+Baby with I do.
+
+For aver it beher.
+
+Hey, you love me down, dont
+You love you
+Haded me look doard fun, Uhaog.
+
+Eight whet do.
+That I olent the lipt dost zuch they ald me.
+That me, ont like will say you, lave it beat, back, m'be, kist Oh.
+Ght, I'm go to momed made, love you,
+I know.
+
+I'm down, do. Im loune only master mine, love you 
+			\end{lstlisting}
+			\caption{Song lyrics generated from out best network that was trained only on Beatles lyrics data.}
+			\label{notransfer_sample}
+		\end{figure}
+		
+		\begin{figure}
+			\begin{lstlisting}
+The love keep all in the world
+
+Well.
+
+very really be in my get to love shes ambetes of the sand little get all the belong,
+Don't be a sky of bed it be.
+I wanna have in the with you.
+Endee always, cant you wanna hay I hear you, after with the some undelds musing in the a taxmons
+I trould not bey I sad think a little getting me.
+
+Everybody way
+
+I love.
+Rus a tom can I said I'm going the and down
+And I'm down.
+
+She's of there.
+Well the sky on the looks adsilg to me
+What been,
+Im it tree
+I'll m'tould be, girl in the love, shopers dads to plamine and love
+And the beave
+Sker a feel (und on it get how way is the undeand.
+
+It's better
+Take you are
+The light really come out.
+What I know she say where the way the mone my be, let a down,
+That she's gonna wine in my world me.
+That now.
+
+When you know I with shes so wont to getter be, love mine in the kit Don't want.
+
+Hey are roal and fool in the morning all a the oud clopetout
+
+Well me what I want)
+I feel
+And the one a little girl
+I'm more is she 
+			\end{lstlisting}
+			\caption{Song lyrics generated from a network that was pretrained on Project Gutenberg data that then had its first and last LSTM layer (and hidden-state-to-character layer) retrained. This model is the one from the second row of \tablename{\ref{GutenbergResults}}.}
+			\label{gutenberg_sample}
+		\end{figure}
+		
+		\begin{figure}
+			\begin{lstlisting}
+The Heart The word of me her the know you, the days
+I've love the world I know
+
+Bring you
+
+I've dont see the and in a hand on the south, in love, follow a me jum call all the moon  
+Well I know I want you to With the what I will shine the land won't some looking of throtk to me and me one day
+
+I'm a bifl better like it the other got beg love halley got you alone, she want you wanting of the scart.
+
+He's a better light to me  
+Note away and the world.
+
+Love in your only oh come the things I now I can't be.
+
+Lat a love me.
+
+She give we'll feel for you back 'gurner, the car with why I wander in the love from how money ta me your shoes and bitter me broken go born (You kill then when I'll believe)
+
+Take everything in your head with resays you're more you believe, don't knew you, now In a bite the sky.
+Seck place
+20s the mar on you s  to say,
+
+Who loves you, save the one that waiting say you love you when you
+
+Yeah dont what we bet you prosed the shadow on the marrort set him better
+can want
+			\end{lstlisting}
+			\caption{Song lyrics generated from a network that was pretrained on song lyrics data that then had its final LSTM layer (and hidden-state-to-character layer) retrained. This model is the one from the last row of \tablename{\ref{LyricsResults}}.}
+			\label{lyrics_sample}
+		\end{figure}
+
+\section{Further Work}
+	While some of the results from our transfer learning experiments match what we would expect given our knowledge of transfer learning with convolutional neural networks for computer vision, some of the results did not match. The performance of a network learned from a pretrained network on the Beatles dataset generally depended the number of layers we re-trained, but not the specific layer that we re-trained. For example, re-training the last layer of a 3-layer LSTM pretrained on lyrics data performed approximately the same as re-training the first layer.
+	
+	This is not the case with convolutional neural networks; it is well known that re-training the last layer(s) of deep convolutional networks results in better performance when doing transfer learning~\cite{CNNOffTheShelf}~\cite{TransferableFeaturesNN} because later layers of convolutional networks correspond to higher-level features of the image. The fact that this result does not hold with our approach to transfer learning suggests that the conventional wisdom of later layers corresponding to higher-level features of the input data does not hold with stacked LSTM's. Further work could thus focus on determining exactly what weights in stacked LSTM's (or recurrent neural networks in general) correspond to higher-level features of text. Re-training these weights should result in superior performance with transferring pretrained recurrent neural networks.
+	
+	Another approach could focus on designing recurrent neural network architectures that have a natural notion of which parts of the network correspond to higher-level features of the input. Such architectures would enable transfer learning with text data, and they may lead to more interpretable models, just as convolutional neural networks with their interpretable lower layers have led to a greater understanding of how neural networks process images.
+
+\section{Conclusion}
+	We demonstrated the effectiveness of a novel approach to transfer learning with LSTM's for text generation. We used this technique to train a network that predicted and generated text on a small dataset (song lyrics from The Beatles) better than we could do by training a network only on said small dataset.
+
+{\small
+\bibliographystyle{ieee}
+\bibliography{egbib}
+}
+
+\end{document}

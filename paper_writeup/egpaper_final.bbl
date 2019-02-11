@@ -1,0 +1,38 @@
+\begin{thebibliography}{1}\itemsep=-1pt
+
+\bibitem{MovieDialogCorpus}
+C.~Danescu-Niculescu-Mizil and L.~Lee.
+\newblock Chameleons in imagined conversations: A new approach to understanding
+  coordination of linguistic style in dialogs.
+\newblock In {\em Proceedings of the Workshop on Cognitive Modeling and
+  Computational Linguistics, ACL 2011}, 2011.
+
+\bibitem{LSTMArchitecturesSurvey}
+K.~Greff, R.~K. Srivastava, J.~Koutn\'{i}k, B.~R. Steunebrink, and
+  J.~Schmidhuber.
+\newblock Lstm: A search space odyssey.
+\newblock {\em IEEE Transactions on Neural Networks and Learning Systems},
+  28(10):2222--2232, 2017.
+
+\bibitem{LSTM}
+S.~Hochreiter, Killough, and J.~Schmidhuber.
+\newblock Long short-term memory.
+\newblock {\em Neural Computation}, 9(8):1735--1780, 1997.
+
+\bibitem{SpeakerAdaptation}
+Y.~Miao and F.~Metze.
+\newblock On speaker adaptation of long short-term memory recurrent neural
+  networks.
+\newblock In {\em Interspeech}, 2015.
+
+\bibitem{CNNOffTheShelf}
+A.~S. Razavian, H.~Azizpour, J.~Sullivan, and S.~Carlsson.
+\newblock {CNN} features off-the-shelf: an astounding baseline for recognition.
+\newblock In {\em CVPR}, 2014.
+
+\bibitem{TransferableFeaturesNN}
+J.~Yosinski, J.~Clune, Y.~Bengio, and H.~Lipson.
+\newblock How transferable are features in deep neural networks?
+\newblock In {\em NIPS}, 2014.
+
+\end{thebibliography}
